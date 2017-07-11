@@ -1,11 +1,13 @@
 var middleware = require('../middleware/index.js');
-var models = require('../models/index.js');
-var router = require('express').Router();
-var Resource = models.Resource;
+var models     = require('../models/index.js');
+var router     = require('express').Router();
+var thinky     = require('../util/thinky.js');
+var r          = thinky.r;
+var Resource   = models.Resource;
 
 var controller = {
   list: function(req, res) {
-    var rdb = Resource;
+    var rdb = Resource.getJoin().orderBy('weight', 'name');
     if (req.query.hasOwnProperty('active') && req.query.active !== "false" && req.query.active !== "0") {
       rdb = rdb.filter(r.row('active').eq(true));
     }
@@ -17,20 +19,20 @@ var controller = {
     }).error(models.handleError(res));
   },
   create: function(req, res) {
-    var resource = new Resource(req.body);
-    resource.save().then(function(result) {
+    new Resource(req.body).save().then(function(result) {
       res.status(201).json({ resource: result });
     }).error(models.handleError(res));
   },
   get: function(req, res) {
-    Resource.get(req.params.id).run().then(function(result) {
+    Resource.get(req.params.id).getJoin().run().then(function(result) {
       res.json({ resource: result });
     }).error(models.handleError(res));
   },
   update: function(req, res) {
-    var resource = new Resource(req.body);
-    Resource.get(req.params.id).update(resource).execute().then(function(result) {
-      res.json({ resource: result });
+    Resource.get(req.params.id).run().then(function(resource) {
+      resource.merge(req.body).save().then(function(result) {
+        res.json({ resource: result });
+      }).error(models.handleError(res));
     }).error(models.handleError(res));
   },
   delete: function(req, res) {

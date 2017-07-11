@@ -5,13 +5,12 @@ var Role = models.Role;
 
 var controller = {
   list: function(req, res) {
-    Role.run().then(function(result) {
+    Role.orderBy({index: 'name'}).run().then(function(result) {
       res.json({ roles: result });
     }).error(models.handleError(res));
   },
   create: function(req, res) {
-    var role = new Role(req.body);
-    role.save().then(function(result) {
+    new Role(req.body).save().then(function(result) {
       res.status(201).json({ role: result });
     }).error(models.handleError(res));
   },
@@ -21,9 +20,10 @@ var controller = {
     }).error(models.handleError(res));
   },
   update: function(req, res) {
-    var role = new Role(req.body);
-    Role.get(req.params.id).update(role).execute().then(function(result) {
-      res.json({ role: result });
+    Role.get(req.params.id).run().then(function(role) {
+      role.merge(req.body).save().then(function(result) {
+        res.json({ role: result });
+      }).error(models.handleError(res));
     }).error(models.handleError(res));
   },
   delete: function(req, res) {

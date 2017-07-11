@@ -1,6 +1,7 @@
 var resource = require('./resource.js');
 var role = require('./role.js');
 var token = require('./token.js');
+var topic = require('./topic.js');
 var user = require('./user.js');
 
 var handleError = function(res) {
@@ -19,9 +20,9 @@ var handleError = function(res) {
 
 module.exports = {
   handleError: handleError,
-  Resource: resource.Resource,
-  ResourceCategory: resource.ResourceCategory,
+  Resource: resource,
   Role: role,
   Token: token,
+  Topic: topic,
   User: user
 };

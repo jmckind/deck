@@ -1,12 +1,15 @@
 var middleware = require('../middleware/index.js');
-var models  = require('../models/index.js');
-var router  = require('express').Router();
-var Role    = models.Role;
-var User    = models.User;
+var models     = require('../models/index.js');
+var router     = require('express').Router();
+var thinky     = require('../util/thinky.js');
+var bcrypt     = require('bcryptjs');
+var r          = thinky.r;
+var Role       = models.Role;
+var User       = models.User;
 
 var controller = {
   list: function(req, res) {
-    User.run().then(function(result) {
+    User.orderBy({index: 'username'}).run().then(function(result) {
       res.json({ users: result });
     }).error(models.handleError(res));
   },
@@ -14,8 +17,11 @@ var controller = {
     var user = new User(req.body);
     user.password = bcrypt.hashSync(user.password);
 
-    user.save().then(function(result) {
-      res.status(201).json({ user: result });
+    Role.filter(r.row('name').eq('user')).run().then(function(roles) {
+      user.roles = roles; // There should only be one!
+      user.saveAll().then(function(result) {
+        res.status(201).json({ user: result });
+      }).error(models.handleError(res));
     }).error(models.handleError(res));
   },
   get: function(req, res) {
@@ -24,17 +30,13 @@ var controller = {
     }).error(models.handleError(res));
   },
   update: function(req, res) {
-    var update = new User(req.body);
+    var data = req.body;
     User.get(req.params.id).run().then(function(user) {
-      user.first_name = update.first_name;
-      user.last_name = update.last_name;
-
-      if (update.password && update.password.length > 0) {
-        user.password = bcrypt.hashSync(update.password); // Hash password
+      if (data.password && data.password.length > 0) {
+        data.password = bcrypt.hashSync(data.password); // Hash password
       }
 
-      user.modified_date = r.now();
-      user.save().then(function(result) {
+      user.merge(data).save().then(function(result) {
         res.json({ user: result });
       }).error(models.handleError(res));
     }).error(models.handleError(res));

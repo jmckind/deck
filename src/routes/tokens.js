@@ -49,7 +49,11 @@ var controller = {
           return res.json({ token: user.token });
         }
       } else {
-        var token = new Token({userId: user.id, expiration_date: r.now().add(config.deck.token_validity)});
+        var token = new Token({
+          userId: user.id,
+          expiration_date: r.now().add(config.deck.token_validity)}
+        );
+
         token.save().then(function(result) {
           return res.status(201).json({ token: result });
         }).error(models.handleError(res));
