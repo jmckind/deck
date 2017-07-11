@@ -2,10 +2,11 @@ var config     = require('./settings.js');
 var middleware = require('../middleware/index.js');
 var routes     = require('../routes/index.js');
 var express    = require('express');
-var app        = express();
 var bodyParser = require('body-parser');
 var cors       = require('cors');
 var morgan     = require('morgan');
+
+var app = express();
 
 app.disable('x-powered-by');
 app.use(bodyParser.json());
