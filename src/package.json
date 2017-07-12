@@ -4,7 +4,7 @@
   "description": "RESTful API backend for a simple LMS",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "start": "node server.js"
   },
   "author": "John McKenzie",
@@ -16,5 +16,8 @@
     "express": "^4.15.3",
     "morgan": "^1.8.2",
     "thinky": "^2.3.8"
+  },
+  "devDependencies": {
+    "mocha": "^3.4.2"
   }
 }
